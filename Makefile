@@ -22,22 +22,22 @@ CXXFLAGS += -fsanitize=undefined,address -fno-omit-frame-pointer
 endif
 
 
-all: state_finder dust_finder
+all: state_finder iwerdust
  
 state_finder: state_finder.cpp state_score.hpp
 	$(CXX) $(CXXFLAGS) -o $@ state_finder.cpp
 
-dust_finder: dust_finder.cpp state_score.hpp
-	$(CXX) $(CXXFLAGS) -o $@ dust_finder.cpp
+iwerdust: iwerdust.cpp state_score.hpp
+	$(CXX) $(CXXFLAGS) -o $@ iwerdust.cpp
 
-profile: dust_finder.cpp
-	$(CXX) $(CXXFLAGS) -fprofile-instr-generate -o $@ dust_finder.cpp
+profile: iwerdust.cpp
+	$(CXX) $(CXXFLAGS) -fprofile-instr-generate -o $@ iwerdust.cpp
 	./profile 200 0 1000000 > /dev/null
 	llvm-profdata-10 merge -output=code.profdata default.profraw
 	
 
 opt: profile
-	$(CXX) $(CXXFLAGS) -fprofile-instr-use=code.profdata -o $@ dust_finder.cpp
+	$(CXX) $(CXXFLAGS) -fprofile-instr-use=code.profdata -o $@ iwerdust.cpp
 
 clean:
-	rm -f dust_finder state_finder profile opt perf.data perf.data.old code.profdata default.profraw
+	rm -f iwerdust state_finder profile opt perf.data perf.data.old code.profdata default.profraw
